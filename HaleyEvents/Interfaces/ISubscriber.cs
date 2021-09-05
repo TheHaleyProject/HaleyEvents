@@ -9,7 +9,8 @@ namespace Haley.Abstractions
     public interface ISubscriber
     {
         string id { get; set; }
-        Type declaring_type { get;}
+        Type declaring_type { get; }
+        string group_id { get; }
         string listener_method { get; set; }
         void sendMessage(params object[] args);
     }

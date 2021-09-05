@@ -11,12 +11,12 @@ namespace Haley.Events
     /// <summary>
     /// Implementing a simple observer pattern
     /// </summary>
-    public abstract class HBaseEvent
+    public abstract class EventBase
     {
         //private ConcurrentBag<ISubscriber> _subscribers = new ConcurrentBag<ISubscriber>();
         private ConcurrentDictionary<string, ISubscriber> _subscribers = new ConcurrentDictionary<string, ISubscriber>();
         #region PROTECTED METHODS
-        protected virtual void basePublish(params object[] arguments)
+        protected void _publish(params object[] arguments)
         {
             // Using params keyword, because we can have zero or more parameters
             //This should invoke all the delegates
@@ -25,32 +25,37 @@ namespace Haley.Events
                 _subscriber.Value.sendMessage(arguments);
             }
         }
-        protected virtual string baseSubscribe(ISubscriber subscriber, bool allow_duplicates=false)
+        protected string _subscribe(ISubscriber subscriber, bool allow_duplicates = false)
         {
+            //If group id is null, then it means we take on the default value.
             if (!allow_duplicates)
             {
                 var _kvp = _subscribers.FirstOrDefault(sub =>
-            sub.Value.listener_method == subscriber.listener_method && sub.Value.declaring_type == subscriber.declaring_type);
+            sub.Value.listener_method == subscriber.listener_method &&
+            sub.Value.declaring_type == subscriber.declaring_type &&
+            sub.Value.group_id == subscriber.group_id);
                 if (_kvp.Value != null)
                 {
                     return _kvp.Value.id;
                 }
             }
-            
-            _subscribers.TryAdd(subscriber.id, subscriber);
+
+            _subscribers.TryAdd(subscriber.id, subscriber); //This subscriber can be a duplicate of same group or a new subscriber with a new group id.
             return subscriber.id;
         }
 
-        protected virtual bool baseUnSubscribe(string subscriber_id)
+        protected bool _unSubscribe(string subscriber_id)
         {
             ISubscriber _removed_value;
             var _removed = _subscribers.TryRemove(subscriber_id, out _removed_value);
             return _removed;
         }
-        protected virtual void baseUnSubscriberAll()
+        protected void _unSubscriberAll()
         {
             _subscribers = new ConcurrentDictionary<string, ISubscriber>();
         }
+
+
         #endregion
 
         #region VIRTUAL METHODS
@@ -61,7 +66,28 @@ namespace Haley.Events
         /// <returns></returns>
         public virtual bool unSubscribe(string subscription_key) //Only one item will be unsubscribed.
         {
-            return baseUnSubscribe(subscription_key);
+            return _unSubscribe(subscription_key);
+        }
+
+        public virtual bool unSubscribeGroup(string group_id)
+        {
+            try
+            {
+                //Even though we know that default subscriptions doesn't have a group ID, we need to ensure that those doesn't get deleted by mistake.
+                if (string.IsNullOrEmpty(group_id)) return false; //In case of null, we should not even check.
+                List<string> _toremove = _subscribers.Where(_kvp => !(string.IsNullOrEmpty(_kvp.Value.group_id)) && _kvp.Value.group_id == group_id)?.Select(p => p.Key)?.ToList();
+                if (_toremove == null || _toremove.Count == 0) return true;
+                foreach (var item in _toremove)
+                {
+                    _unSubscribe(item);
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+
+                return false;
+            }
         }
 
         /// <summary>
@@ -69,17 +95,28 @@ namespace Haley.Events
         /// </summary>
         /// <param name="subscription_key"></param>
         /// <returns></returns>
-        public virtual bool unSubscribe(Type declaring_parent) //Only one item will be unsubscribed.
+        public virtual bool unSubscribe(Type declaring_parent, bool include_all_groups = false) //Only one item will be unsubscribed.
         {
             if (declaring_parent == null) return false;
             try
             {
-                var _toremove = _subscribers.Where(_kvp => _kvp.Value.declaring_type == declaring_parent)?.Select(p => p.Key)?.ToList();
+                List<string> _toremove = new List<string>();
+                var _allMatches = _subscribers.Where(_kvp => _kvp.Value.declaring_type == declaring_parent);
+                if (include_all_groups)
+                {
+                    _toremove = _allMatches?.Select(p => p.Key)?.ToList(); //Get all, including the groups.
+                }
+                else
+                {
+                    var _groupsIgnoredMatches = _allMatches?.Where(_kvp => string.IsNullOrEmpty(_kvp.Value.group_id))?.ToList();
+                    _toremove = _groupsIgnoredMatches?.Select(p => p.Key)?.ToList();
+                }
+
                 if (_toremove == null || _toremove.Count == 0) return false;
 
                 foreach (var item in _toremove)
                 {
-                    baseUnSubscribe(item);
+                    _unSubscribe(item);
                 }
                 return true;
             }
@@ -94,9 +131,9 @@ namespace Haley.Events
         /// </summary>
         /// <typeparam name="TParent">Declaring Type to be removed.</typeparam>
         /// <returns></returns>
-        public virtual bool unSubscribe<TParent>()
+        public virtual bool unSubscribe<TParent>(bool include_all_groups = false)
         {
-            return unSubscribe(typeof(TParent));
+            return unSubscribe(typeof(TParent), include_all_groups);
         }
 
         #endregion

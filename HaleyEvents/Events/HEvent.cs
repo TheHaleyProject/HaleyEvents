@@ -8,30 +8,30 @@ using System.Threading.Tasks;
 namespace Haley.Events
 {
 
-    public class HEvent : HBaseEvent
+    public class HEvent : EventBase
     {
         public void publish()
         {
             //Publish without passing arguments
-            basePublish();
+            base._publish();
         }
-        public string subscribe(Action listener, bool allow_duplicate = false)
+        public string subscribe(Action listener, bool allow_duplicate = false, string group_id = null)
         {
-            SubscriberBase _newinfo = new SubscriberBase(listener);
-            return baseSubscribe(_newinfo, allow_duplicate); //Returning the subscription id
+            SubscriberBase _newinfo = new SubscriberBase(listener, group_id);
+            return base._subscribe(_newinfo, allow_duplicate); //Returning the subscription id
         }
     }
 
-    public class HEvent<T> : HBaseEvent
+    public class HEvent<T> : EventBase
     {
         public void publish(T eventArguments)
         {
-            base.basePublish(eventArguments);
+            base._publish(eventArguments);
         }
-        public string subscribe(Action<T> listener, bool allow_duplicate = false)
+        public string subscribe(Action<T> listener, bool allow_duplicate = false, string group_id = null)
         {
-            SubscriberBase<T> _newinfo = new SubscriberBase<T>(listener);
-            return baseSubscribe(_newinfo, allow_duplicate); //Returning the subscription id
+            SubscriberBase<T> _newinfo = new SubscriberBase<T>(listener, group_id);
+            return base._subscribe(_newinfo, allow_duplicate); //Returning the subscription id
         }
     }
 }
