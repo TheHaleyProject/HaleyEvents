@@ -12,6 +12,6 @@ namespace Haley.Abstractions
         Type declaring_type { get; }
         string group_id { get; }
         string listener_method { get; set; }
-        void sendMessage(params object[] args);
+        void SendMessage(params object[] args);
     }
 }

@@ -36,7 +36,7 @@ namespace Haley.Events
         {
             foreach (var _event in _event_collection.Values)
             {
-                _event.unSubscribe<TParent>(include_all_groups); //This will try and remove the parents if already registered.
+                _event.UnSubscribe<TParent>(include_all_groups); //This will try and remove the parents if already registered.
             }
         }
 
@@ -44,7 +44,7 @@ namespace Haley.Events
         {
             foreach (var _event in _event_collection.Values)
             {
-                _event.unSubscribe(parent, include_all_groups); //This will try and remove the parents if already registered.
+                _event.UnSubscribe(parent, include_all_groups); //This will try and remove the parents if already registered.
             }
         }
 
@@ -52,7 +52,7 @@ namespace Haley.Events
         {
             foreach (var _event in _event_collection.Values)
             {
-                _event.unSubscribe(subscription_key); //This will try and remove the parents if already registered.
+                _event.UnSubscribe(subscription_key); //This will try and remove the parents if already registered.
             }
         }
 
@@ -60,7 +60,7 @@ namespace Haley.Events
         {
             foreach (var _event in _event_collection.Values)
             {
-                _event.unSubscribeGroup(group_id);
+                _event.UnSubscribeGroup(group_id);
             }
         }
 

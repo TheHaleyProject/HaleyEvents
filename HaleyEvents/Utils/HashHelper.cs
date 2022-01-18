@@ -13,7 +13,7 @@ namespace Haley.Events.Utils
 {
     internal class HashHelper
     {
-        public static byte[] computeHash(string to_hash)
+        public static byte[] ComputeHash(string to_hash)
         {
             byte[] computed_hash = null;
             var _to_hash_bytes = Encoding.ASCII.GetBytes(to_hash);

@@ -35,7 +35,7 @@ namespace Haley.Events
             group_id = _group_id; //This is used for grouping together a set of events and it will be easy to unsubscribe if required.
         }
 
-        public void sendMessage(params object[] args)
+        public void SendMessage(params object[] args)
         {
             if (args.Length == 0)
             {

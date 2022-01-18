@@ -22,7 +22,7 @@ namespace Haley.Events
             //This should invoke all the delegates
             foreach (var _subscriber in _subscribers)
             {
-                _subscriber.Value.sendMessage(arguments);
+                _subscriber.Value.SendMessage(arguments);
             }
         }
         protected string _subscribe(ISubscriber subscriber, bool allow_duplicates = false)
@@ -64,12 +64,12 @@ namespace Haley.Events
         /// </summary>
         /// <param name="subscription_key"></param>
         /// <returns></returns>
-        public virtual bool unSubscribe(string subscription_key) //Only one item will be unsubscribed.
+        public virtual bool UnSubscribe(string subscription_key) //Only one item will be unsubscribed.
         {
             return _unSubscribe(subscription_key);
         }
 
-        public virtual bool unSubscribeGroup(string group_id)
+        public virtual bool UnSubscribeGroup(string group_id)
         {
             try
             {
@@ -95,7 +95,7 @@ namespace Haley.Events
         /// </summary>
         /// <param name="subscription_key"></param>
         /// <returns></returns>
-        public virtual bool unSubscribe(Type declaring_parent, bool include_all_groups = false) //Only one item will be unsubscribed.
+        public virtual bool UnSubscribe(Type declaring_parent, bool include_all_groups = false) //Only one item will be unsubscribed.
         {
             if (declaring_parent == null) return false;
             try
@@ -131,9 +131,9 @@ namespace Haley.Events
         /// </summary>
         /// <typeparam name="TParent">Declaring Type to be removed.</typeparam>
         /// <returns></returns>
-        public virtual bool unSubscribe<TParent>(bool include_all_groups = false)
+        public virtual bool UnSubscribe<TParent>(bool include_all_groups = false)
         {
-            return unSubscribe(typeof(TParent), include_all_groups);
+            return UnSubscribe(typeof(TParent), include_all_groups);
         }
 
         #endregion
