@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Collections.Concurrent;
 
 namespace Haley.Events
@@ -14,9 +15,10 @@ namespace Haley.Events
     public abstract class EventBase
     {
         //private ConcurrentBag<ISubscriber> _subscribers = new ConcurrentBag<ISubscriber>();
+        public SynchronizationContext SynchronizationContext { get; set; }
         private ConcurrentDictionary<string, ISubscriber> _subscribers = new ConcurrentDictionary<string, ISubscriber>();
         #region PROTECTED METHODS
-        protected void _publish(params object[] arguments)
+        protected void publish(params object[] arguments)
         {
             // Using params keyword, because we can have zero or more parameters
             //This should invoke all the delegates
@@ -25,32 +27,32 @@ namespace Haley.Events
                 _subscriber.Value.SendMessage(arguments);
             }
         }
-        protected string _subscribe(ISubscriber subscriber, bool allow_duplicates = false)
+        protected string subscribe(ISubscriber subscriber, bool allow_duplicates = false)
         {
             //If group id is null, then it means we take on the default value.
             if (!allow_duplicates)
             {
                 var _kvp = _subscribers.FirstOrDefault(sub =>
-            sub.Value.listener_method == subscriber.listener_method &&
-            sub.Value.declaring_type == subscriber.declaring_type &&
-            sub.Value.group_id == subscriber.group_id);
+            sub.Value.ListenerMethod == subscriber.ListenerMethod &&
+            sub.Value.DeclaringType == subscriber.DeclaringType &&
+            sub.Value.GroupId == subscriber.GroupId);
                 if (_kvp.Value != null)
                 {
-                    return _kvp.Value.id;
+                    return _kvp.Value.Id;
                 }
             }
 
-            _subscribers.TryAdd(subscriber.id, subscriber); //This subscriber can be a duplicate of same group or a new subscriber with a new group id.
-            return subscriber.id;
+            _subscribers.TryAdd(subscriber.Id, subscriber); //This subscriber can be a duplicate of same group or a new subscriber with a new group id.
+            return subscriber.Id;
         }
 
-        protected bool _unSubscribe(string subscriber_id)
+        protected bool unSubscribe(string subscriber_id)
         {
             ISubscriber _removed_value;
             var _removed = _subscribers.TryRemove(subscriber_id, out _removed_value);
             return _removed;
         }
-        protected void _unSubscriberAll()
+        protected void unSubscribeAll()
         {
             _subscribers = new ConcurrentDictionary<string, ISubscriber>();
         }
@@ -66,7 +68,7 @@ namespace Haley.Events
         /// <returns></returns>
         public virtual bool UnSubscribe(string subscription_key) //Only one item will be unsubscribed.
         {
-            return _unSubscribe(subscription_key);
+            return unSubscribe(subscription_key);
         }
 
         public virtual bool UnSubscribeGroup(string group_id)
@@ -75,11 +77,11 @@ namespace Haley.Events
             {
                 //Even though we know that default subscriptions doesn't have a group ID, we need to ensure that those doesn't get deleted by mistake.
                 if (string.IsNullOrEmpty(group_id)) return false; //In case of null, we should not even check.
-                List<string> _toremove = _subscribers.Where(_kvp => !(string.IsNullOrEmpty(_kvp.Value.group_id)) && _kvp.Value.group_id == group_id)?.Select(p => p.Key)?.ToList();
+                List<string> _toremove = _subscribers.Where(_kvp => !(string.IsNullOrEmpty(_kvp.Value.GroupId)) && _kvp.Value.GroupId == group_id)?.Select(p => p.Key)?.ToList();
                 if (_toremove == null || _toremove.Count == 0) return true;
                 foreach (var item in _toremove)
                 {
-                    _unSubscribe(item);
+                    unSubscribe(item);
                 }
                 return true;
             }
@@ -101,14 +103,14 @@ namespace Haley.Events
             try
             {
                 List<string> _toremove = new List<string>();
-                var _allMatches = _subscribers.Where(_kvp => _kvp.Value.declaring_type == declaring_parent);
+                var _allMatches = _subscribers.Where(_kvp => _kvp.Value.DeclaringType == declaring_parent);
                 if (include_all_groups)
                 {
                     _toremove = _allMatches?.Select(p => p.Key)?.ToList(); //Get all, including the groups.
                 }
                 else
                 {
-                    var _groupsIgnoredMatches = _allMatches?.Where(_kvp => string.IsNullOrEmpty(_kvp.Value.group_id))?.ToList();
+                    var _groupsIgnoredMatches = _allMatches?.Where(_kvp => string.IsNullOrEmpty(_kvp.Value.GroupId))?.ToList();
                     _toremove = _groupsIgnoredMatches?.Select(p => p.Key)?.ToList();
                 }
 
@@ -116,7 +118,7 @@ namespace Haley.Events
 
                 foreach (var item in _toremove)
                 {
-                    _unSubscribe(item);
+                    unSubscribe(item);
                 }
                 return true;
             }

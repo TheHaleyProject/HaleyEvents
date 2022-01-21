@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Haley.Enums;
 
 namespace Haley.Events
 {
@@ -13,12 +14,12 @@ namespace Haley.Events
         public void Publish()
         {
             //Publish without passing arguments
-            base._publish();
+            base.publish();
         }
-        public string Subscribe(Action listener, bool allow_duplicate = false, string group_id = null)
+        public string Subscribe(Action listener, bool allow_duplicate = false, string group_id = null, InvokeOption option = InvokeOption.DefaultThread)
         {
             SubscriberBase _newinfo = new SubscriberBase(listener, group_id);
-            return base._subscribe(_newinfo, allow_duplicate); //Returning the subscription id
+            return base.subscribe(_newinfo, allow_duplicate); //Returning the subscription id
         }
     }
 
@@ -26,12 +27,12 @@ namespace Haley.Events
     {
         public void Publish(T eventArguments)
         {
-            base._publish(eventArguments);
+            base.publish(eventArguments);
         }
-        public string Subscribe(Action<T> listener, bool allow_duplicate = false, string group_id = null)
+        public string Subscribe(Action<T> listener, bool allow_duplicate = false, string group_id = null, InvokeOption option = InvokeOption.DefaultThread)
         {
             SubscriberBase<T> _newinfo = new SubscriberBase<T>(listener, group_id);
-            return base._subscribe(_newinfo, allow_duplicate); //Returning the subscription id
+            return base.subscribe(_newinfo, allow_duplicate); //Returning the subscription id
         }
     }
 }

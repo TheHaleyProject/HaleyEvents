@@ -21,8 +21,8 @@
 	  <AssemblyOriginatorKeyFile>HaleyProject.snk</AssemblyOriginatorKeyFile>
 	  <AssemblyVersion>2.0.3.0</AssemblyVersion>
 	  <FileVersion>2.0.3.0</FileVersion>
-	  <PackageReleaseNotes>Camel case changed to pascal case.</PackageReleaseNotes>
-	  <Version>2.1.0</Version>
+	  <PackageReleaseNotes>Synchronization Context added</PackageReleaseNotes>
+	  <Version>2.1.1</Version>
 	  <PackageIconUrl />
   </PropertyGroup>
 

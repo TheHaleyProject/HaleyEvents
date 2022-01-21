@@ -2,14 +2,14 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Haley.Abstractions;
+using System.Threading;
 
 namespace Haley.Events
 {
     public sealed class EventStore : IEventService
     {
-        private ConcurrentDictionary<Type, EventBase> _event_collection = new ConcurrentDictionary<Type, EventBase>();
-
         // Core idea is that a list of delegates are stored. During run time, the delegates are invoked.
+        private ConcurrentDictionary<Type, EventBase> _event_collection = new ConcurrentDictionary<Type, EventBase>();
 
         public T GetEvent<T>() where T : EventBase, new()
         {
@@ -17,7 +17,10 @@ namespace Haley.Events
             if (!_event_collection.ContainsKey(_target_type))
             {
                 //If key is not present , add it
-                _event_collection.TryAdd(_target_type, new T());
+                var _newevent = new T();
+                _newevent.SynchronizationContext = SynchronizationContext.Current;
+                //Whichever thread first tries to get the event (either for publishing or subscription), will set their context as the synchronization context.
+                _event_collection.TryAdd(_target_type, _newevent);
             }
             T result = (T)_event_collection[_target_type] ?? null;
             return result;

@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Haley.Enums;
 
 namespace Haley.Abstractions
 {
     public interface ISubscriber
     {
-        string id { get; set; }
-        Type declaring_type { get; }
-        string group_id { get; }
-        string listener_method { get; set; }
+        string Id { get; set; }
+        Type DeclaringType { get; }
+        string GroupId { get; }
+        string ListenerMethod { get; set; }
         void SendMessage(params object[] args);
     }
 }
