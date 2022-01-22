@@ -16,11 +16,8 @@ namespace Haley.Events
             Type _target_type = typeof(T);
             if (!_event_collection.ContainsKey(_target_type))
             {
-                //If key is not present , add it
-                var _newevent = new T();
-                _newevent.SynchronizationContext = SynchronizationContext.Current;
-                //Whichever thread first tries to get the event (either for publishing or subscription), will set their context as the synchronization context.
-                _event_collection.TryAdd(_target_type, _newevent);
+                //Whichever thread tries to subscribe to the event with "UIThread as option" will also set their context as the synchronization context.
+                _event_collection.TryAdd(_target_type, new T());
             }
             T result = (T)_event_collection[_target_type] ?? null;
             return result;

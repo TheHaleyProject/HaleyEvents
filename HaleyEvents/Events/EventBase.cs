@@ -15,7 +15,6 @@ namespace Haley.Events
     public abstract class EventBase
     {
         //private ConcurrentBag<ISubscriber> _subscribers = new ConcurrentBag<ISubscriber>();
-        public SynchronizationContext SynchronizationContext { get; set; }
         private ConcurrentDictionary<string, ISubscriber> _subscribers = new ConcurrentDictionary<string, ISubscriber>();
         #region PROTECTED METHODS
         protected void publish(params object[] arguments)
