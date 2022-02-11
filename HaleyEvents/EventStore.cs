@@ -9,9 +9,9 @@ namespace Haley.Events
     public sealed class EventStore : IEventService
     {
         // Core idea is that a list of delegates are stored. During run time, the delegates are invoked.
-        private ConcurrentDictionary<Type, EventBase> _event_collection = new ConcurrentDictionary<Type, EventBase>();
+        private ConcurrentDictionary<Type, IEventBase> _event_collection = new ConcurrentDictionary<Type, IEventBase>();
 
-        public T GetEvent<T>() where T : EventBase, new()
+        public T GetEvent<T>() where T : class, IEventBase, new()
         {
             Type _target_type = typeof(T);
             if (!_event_collection.ContainsKey(_target_type))
@@ -25,14 +25,14 @@ namespace Haley.Events
 
         public void ClearAll()
         {
-            _event_collection = new ConcurrentDictionary<Type, EventBase>(); //Clear all previously subscribed events.
+            _event_collection = new ConcurrentDictionary<Type, IEventBase>(); //Clear all previously subscribed events.
         }
 
         /// <summary>
         /// Clear all the events with the declaring parent matching the arguments.
         /// </summary>
         /// <typeparam name="TParent"></typeparam>
-        public void ClearAll<TParent>(bool include_all_groups = false)
+        public void ClearAll<TParent>(bool include_all_groups = false) where TParent:class
         {
             foreach (var _event in _event_collection.Values)
             {

@@ -12,7 +12,7 @@ namespace Haley.Events
     /// <summary>
     /// Implementing a simple observer pattern
     /// </summary>
-    public abstract class EventBase
+    public abstract class EventBase : IEventBase
     {
         //private ConcurrentBag<ISubscriber> _subscribers = new ConcurrentBag<ISubscriber>();
         private ConcurrentDictionary<string, ISubscriber> _subscribers = new ConcurrentDictionary<string, ISubscriber>();
@@ -132,7 +132,7 @@ namespace Haley.Events
         /// </summary>
         /// <typeparam name="TParent">Declaring Type to be removed.</typeparam>
         /// <returns></returns>
-        public virtual bool UnSubscribe<TParent>(bool include_all_groups = false)
+        public virtual bool UnSubscribe<TParent>(bool include_all_groups = false) where TParent:class
         {
             return UnSubscribe(typeof(TParent), include_all_groups);
         }
