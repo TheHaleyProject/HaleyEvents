@@ -21,8 +21,8 @@
 	  <AssemblyOriginatorKeyFile>HaleyProject.snk</AssemblyOriginatorKeyFile>
 	  <AssemblyVersion>2.0.3.0</AssemblyVersion>
 	  <FileVersion>2.0.3.0</FileVersion>
-	  <PackageReleaseNotes>Synchronization Context added</PackageReleaseNotes>
-	  <Version>2.1.4</Version>
+	  <PackageReleaseNotes>Updated references</PackageReleaseNotes>
+	  <Version>2.1.6</Version>
 	  <PackageIconUrl />
 	  <Copyright>Haley</Copyright>
   </PropertyGroup>
