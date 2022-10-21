@@ -3,68 +3,46 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Haley.Abstractions;
 using System.Threading;
+using Haley.Services;
 
 namespace Haley.Events
 {
-    public sealed class EventStore : IEventService
+    public sealed class EventStore
     {
-        // Core idea is that a list of delegates are stored. During run time, the delegates are invoked.
-        private ConcurrentDictionary<Type, IEventBase> _event_collection = new ConcurrentDictionary<Type, IEventBase>();
-
-        public T GetEvent<T>() where T : class, IEventBase, new()
-        {
-            Type _target_type = typeof(T);
-            if (!_event_collection.ContainsKey(_target_type))
-            {
-                //Whichever thread tries to subscribe to the event with "UIThread as option" will also set their context as the synchronization context.
-                _event_collection.TryAdd(_target_type, new T());
-            }
-            T result = (T)_event_collection[_target_type] ?? null;
-            return result;
+        #region Static Items
+        private static IEventService _instance = new EventService(); //static item.
+        public static T GetEvent<T>() where T : class, IEventBase, new() {
+            return _instance.GetEvent<T>();
         }
 
-        public void ClearAll()
-        {
-            _event_collection = new ConcurrentDictionary<Type, IEventBase>(); //Clear all previously subscribed events.
+        public static void ClearAll() {
+            _instance.ClearAll();
         }
 
         /// <summary>
         /// Clear all the events with the declaring parent matching the arguments.
         /// </summary>
         /// <typeparam name="TParent"></typeparam>
-        public void ClearAll<TParent>(bool include_all_groups = false) where TParent:class
-        {
-            foreach (var _event in _event_collection.Values)
-            {
-                _event.UnSubscribe<TParent>(include_all_groups); //This will try and remove the parents if already registered.
-            }
+        public static void ClearAll<TParent>(bool include_all_groups = false) where TParent : class {
+            _instance.ClearAll<TParent>(include_all_groups);
         }
 
-        public void ClearAll(Type parent, bool include_all_groups = false)
-        {
-            foreach (var _event in _event_collection.Values)
-            {
-                _event.UnSubscribe(parent, include_all_groups); //This will try and remove the parents if already registered.
-            }
+        public static void ClearAll(Type parent, bool include_all_groups = false) {
+            _instance.ClearAll(parent, include_all_groups);
         }
 
-        public void ClearAll(string subscription_key)
-        {
-            foreach (var _event in _event_collection.Values)
-            {
-                _event.UnSubscribe(subscription_key); //This will try and remove the parents if already registered.
-            }
+        public static void ClearAll(string subscription_key) {
+            _instance.ClearAll(subscription_key);
         }
 
-        public void ClearGroup(string group_id)
-        {
-            foreach (var _event in _event_collection.Values)
-            {
-                _event.UnSubscribeGroup(group_id);
-            }
+        public static void ClearGroup(string group_id) {
+            _instance.ClearGroup(group_id);
         }
 
-        public static EventStore Singleton = new EventStore();
-        public EventStore() { }
+        #endregion
+
+        [Obsolete(@"Remove the SINGLETON keyword. Replace ""EventStore.Singleton.[METHOD/PROPERTY]"" with ""EventStore.[METHOD/PROPERTY]""", true)]
+        public static EventStore Singleton => null;
+        private EventStore() { }
     }
 }
