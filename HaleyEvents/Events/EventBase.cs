@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Collections.Concurrent;
+using Microsoft.Extensions.Logging;
 
 namespace Haley.Events
 {
@@ -84,9 +85,9 @@ namespace Haley.Events
                 }
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                EventStore.Logger?.LogError(ex.Message);
                 return false;
             }
         }
@@ -121,8 +122,9 @@ namespace Haley.Events
                 }
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                EventStore.Logger?.LogError(ex.Message);
                 return false;
             }
         }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Haley.Abstractions;
 using System.Threading;
 using Haley.Services;
+using Microsoft.Extensions.Logging;
 
 namespace Haley.Events
 {
@@ -11,12 +12,19 @@ namespace Haley.Events
     {
         #region Static Items
         private static IEventService _instance = new EventService(); //static item.
+        public static ILogger Logger { get; private set; }
+        public static bool ThrowExceptions { get; set; } = true;
+
         public static T GetEvent<T>() where T : class, IEventBase, new() {
             return _instance.GetEvent<T>();
         }
 
         public static void ClearAll() {
             _instance.ClearAll();
+        }
+
+        public static void SetLogger(ILogger logger) {
+            Logger = logger;
         }
 
         /// <summary>
@@ -40,9 +48,6 @@ namespace Haley.Events
         }
 
         #endregion
-
-        [Obsolete(@"Remove the SINGLETON keyword. Replace ""EventStore.Singleton.[METHOD/PROPERTY]"" with ""EventStore.[METHOD/PROPERTY]""", true)]
-        public static EventStore Singleton => null;
         private EventStore() { }
     }
 }

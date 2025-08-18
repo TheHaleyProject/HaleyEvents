@@ -1,13 +1,14 @@
 ﻿using Haley.Abstractions;
+using Haley.Enums;
+using Haley.Events.Utils;
+using Microsoft.Extensions.Logging;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Haley.Enums;
-using Haley.Events.Utils;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Haley.Events
 {
@@ -62,36 +63,29 @@ namespace Haley.Events
             }
             catch (Exception ex)
             {
-                throw ex;
+                EventStore.Logger?.LogError(ex.Message);
+                if (EventStore.ThrowExceptions) throw;
             }
         }
 
         private void SendMessageInternal(T param)
         {
-            try
-            {
-                switch (InvokeOption)
-                {
-                    case InvokeOption.BackgroundThread:
-                        //Create a task and run this in a different thread.
-                        Task.Run(()=>listener.Invoke(param)); 
-                        break;
-                    case InvokeOption.UIThread:
-                        //Synchronization Context invoke needed to avoid cross thread calling.
-                        if (SyncContext == null)
-                            throw new ArgumentException($@"Synchronization context for {ListenerMethod} from {DeclaringType} is null. Cannot raise the event. Try calling the event in default thread and handle the UI synchronization.");
+            switch (InvokeOption) {
+                case InvokeOption.BackgroundThread:
+                //Create a task and run this in a different thread.
+                Task.Run(() => listener.Invoke(param));
+                break;
+                case InvokeOption.UIThread:
+                //Synchronization Context invoke needed to avoid cross thread calling.
+                if (SyncContext == null)
+                    throw new ArgumentException($@"Synchronization context for {ListenerMethod} from {DeclaringType} is null. Cannot raise the event. Try calling the event in default thread and handle the UI synchronization.");
 
-                        SyncContext.Post(p => listener.Invoke((T)p), param); //Same param gets sent in as "p" which is then sent to the listener.
-                        break;
-                    default:
-                    case InvokeOption.DefaultThread:
-                        listener.Invoke(param); //Run in the same calling thread.
-                        break;
-                }
-            }
-            catch (Exception)
-            {
-                throw;
+                SyncContext.Post(p => listener.Invoke((T)p), param); //Same param gets sent in as "p" which is then sent to the listener.
+                break;
+                default:
+                case InvokeOption.DefaultThread:
+                listener.Invoke(param); //Run in the same calling thread.
+                break;
             }
         }
     }

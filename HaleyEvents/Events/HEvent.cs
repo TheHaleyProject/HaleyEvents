@@ -19,7 +19,7 @@ namespace Haley.Events
         }
         public string Subscribe(Action listener, bool allow_duplicate = false, string group_id = null, InvokeOption option = InvokeOption.DefaultThread)
         {
-            SubscriberBase _newinfo = new SubscriberBase(listener, group_id);
+            SubscriberBase _newinfo = new SubscriberBase(listener, group_id, option:option);
             if (option == InvokeOption.UIThread)
             {
                 _newinfo.SyncContext = SynchronizationContext.Current; //this gets the context of the subscribing action.
@@ -36,7 +36,7 @@ namespace Haley.Events
         }
         public string Subscribe(Action<T> listener, bool allow_duplicate = false, string group_id = null, InvokeOption option = InvokeOption.DefaultThread)
         {
-            SubscriberBase<T> _newinfo = new SubscriberBase<T>(listener, group_id);
+            SubscriberBase<T> _newinfo = new SubscriberBase<T>(listener, group_id, option: option) { };
             if (option == InvokeOption.UIThread)
             {
                 _newinfo.SyncContext = SynchronizationContext.Current; //this gets the context of the subscribing action.
