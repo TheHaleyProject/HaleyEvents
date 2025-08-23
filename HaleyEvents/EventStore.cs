@@ -15,7 +15,12 @@ namespace Haley.Events
         public static ILogger Logger { get; private set; }
         public static bool ThrowExceptions { get; set; } = true;
 
+        [Obsolete("Replace this with simpler Get<>")]
         public static T GetEvent<T>() where T : class, IEventBase, new() {
+            return _instance.GetEvent<T>();
+        }
+
+        public static T Get<T>() where T : class, IEventBase, new() {
             return _instance.GetEvent<T>();
         }
 
