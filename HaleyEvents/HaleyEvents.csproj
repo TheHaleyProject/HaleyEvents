@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+  <Import Project="..\..\HaleyProject\HaleyVersion.Props" />
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Haley.Events</AssemblyName>
@@ -22,7 +22,7 @@
 	  <AssemblyVersion>2.0.3.0</AssemblyVersion>
 	  <FileVersion>2.0.3.0</FileVersion>
 	  <PackageReleaseNotes>Updated references</PackageReleaseNotes>
-	  <Version>2.2.18</Version>
+	  <Version>$(HaleyEventsVersion)</Version>
 	  <PackageIconUrl />
 	  <Copyright>Haley</Copyright>
   </PropertyGroup>
@@ -55,7 +55,7 @@
     </When>
     <Otherwise>
      <ItemGroup>
-		 <PackageReference Include="Haley.Abstractions" Version="1.2.26" />
+		 <PackageReference Include="Haley.Abstractions" Version="$(HaleyAbstractionsVersion)" />
 	 </ItemGroup>
     </Otherwise>
 </Choose>  
