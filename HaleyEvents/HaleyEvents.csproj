@@ -7,6 +7,8 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Lingam</Authors>
     <Company>TheHaleyProject</Company>
+    <LangVersion>8.0</LangVersion>
+    <Nullable>enable</Nullable>
     <Product>Haley Event</Product>
     <Description>A simple events management module based on Observer Pattern.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
