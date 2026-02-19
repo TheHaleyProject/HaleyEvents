@@ -39,6 +39,7 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 	  <DebugType>full</DebugType>
 	  <DebugSymbols>true</DebugSymbols>
+	  <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 	</PropertyGroup>
 	
 <Import Project="$(SolutionDir)ProjectReferences_$(SolutionName).txt" Condition="Exists('$(SolutionDir)ProjectReferences_$(SolutionName).txt')" />
